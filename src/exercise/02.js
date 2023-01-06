@@ -4,29 +4,31 @@
 import * as React from 'react'
 import {Switch} from '../switch'
 
-function Toggle() {
+function Toggle({children}) {
   const [on, setOn] = React.useState(false)
   const toggle = () => setOn(!on)
 
-  // 🐨 replace this with a call to React.Children.map and map each child in
-  // props.children to a clone of that child with the props they need using
-  // React.cloneElement.
-  // 💰 React.Children.map(props.children, child => {/* return child clone here */})
-  // 📜 https://reactjs.org/docs/react-api.html#reactchildren
-  // 📜 https://reactjs.org/docs/react-api.html#cloneelement
-  return <Switch on={on} onClick={toggle} />
+  return React.Children.map(children, child => {
+    if (allowedTypes.includes(child.type)) {
+    // React.cloneElement() is useful when we want to add or modify the props of a parent component’s children while avoiding unnecessary duplicate code.
+    // Modify children properties
+    // Add to children properties
+    // Extend the functionality of children components
+      return React.cloneElement(child, {on, toggle})
+    }
+
+    return child
+  })
 }
 
-// 🐨 Flesh out each of these components
+const ToggleOn = ({on, children}) => on ? children : null
+const ToggleOff = ({on, children}) => !on ? children : null
+const ToggleButton = ({on, toggle}) => <Switch on={on} onClick={toggle} />
+// consumers can also take the implicitly shared state and use it in their own components
+const MyToggleButton = ({on}) => on ? `button is ON` : `button is OFF`
 
-// Accepts `on` and `children` props and returns `children` if `on` is true
-const ToggleOn = () => null
-
-// Accepts `on` and `children` props and returns `children` if `on` is false
-const ToggleOff = () => null
-
-// Accepts `on` and `toggle` props and returns the <Switch /> with those props.
-const ToggleButton = () => null
+// to not allow the above, we can add allowed types to restrict what components can be added
+const allowedTypes = [ToggleOn, ToggleOff, ToggleButton]
 
 function App() {
   return (
@@ -34,15 +36,12 @@ function App() {
       <Toggle>
         <ToggleOn>The button is on</ToggleOn>
         <ToggleOff>The button is off</ToggleOff>
+        <span>Hello</span>
         <ToggleButton />
+        <MyToggleButton />
       </Toggle>
     </div>
   )
 }
 
 export default App
-
-/*
-eslint
-  no-unused-vars: "off",
-*/
